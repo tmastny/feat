@@ -2,6 +2,7 @@ from functools import singledispatch
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
 from typing import Union
 
@@ -66,3 +67,11 @@ def _(transformer: ColumnTransformer, columns=None, all_columns=None):
     xf_columns = [feat(xfer[1], xfer[2]) for xfer in transformer.transformers_]
 
     return pd.concat(xf_columns).reset_index(drop=True)
+
+
+@feat.register(Pipeline)
+def _(transformer: Pipeline, columns, all_columns=None):
+
+    last_xfer = transformer.steps[-1][1]
+
+    return feat(last_xfer, columns)

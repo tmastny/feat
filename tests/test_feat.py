@@ -6,9 +6,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.preprocessing import FunctionTransformer
 
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.compose import make_column_transformer
+from sklearn.pipeline import make_pipeline
 
 dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -212,3 +214,22 @@ def test_ColumnTransformer1_rev():
     preprocess.fit(X)
 
     assert feat(preprocess).equals(expected)
+
+
+def group_meals(array):
+    return array.applymap(lambda x: "HB" if x == "SC" else x)
+
+
+def test_Pipeline():
+
+    expected = pd.DataFrame(
+        {"name": ["meal", "meal",], "feature": ["x0_BB", "x0_HB",],}
+    )
+
+    xfer_pipeline = make_pipeline(
+        FunctionTransformer(group_meals), OneHotEncoder(sparse=False)
+    )
+
+    xfer_pipeline.fit(X[["meal"]])
+
+    assert feat(xfer_pipeline, ["meal"]).equals(expected)
