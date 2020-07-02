@@ -1,6 +1,7 @@
 from functools import singledispatch
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.compose import ColumnTransformer
 
 from typing import Union
 
@@ -58,3 +59,10 @@ def _(transformer: KBinsDiscretizer, columns):
     df["feature"] = df["name"] + "-" + df["feature"].apply(lambda x: str(round(x)))
 
     return df
+
+
+@feat.register(ColumnTransformer)
+def _(transformer: ColumnTransformer, columns=None, all_columns=None):
+    xf_columns = [feat(xfer[1], xfer[2]) for xfer in transformer.transformers_]
+
+    return pd.concat(xf_columns).reset_index(drop=True)
