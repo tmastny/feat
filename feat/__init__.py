@@ -9,11 +9,13 @@ from typing import Union
 import pandas as pd
 import numpy as np
 
+
 def column_names(columns, all_columns):
     if isinstance(columns[0], str):
         return columns
 
     return all_columns[columns]
+
 
 @singledispatch
 def feat(transformer, names):
@@ -58,6 +60,14 @@ def _(transformer: KBinsDiscretizer, names, all_columns=None):
     return df
 
 
+@feat.register(Pipeline)
+def _(transformer: Pipeline, names):
+
+    last_xfer = transformer.steps[-1][1]
+
+    return feat(last_xfer, names)
+
+
 @feat.register(ColumnTransformer)
 def _(transformer: ColumnTransformer, names):
     xf_columns = [
@@ -66,11 +76,3 @@ def _(transformer: ColumnTransformer, names):
     ]
 
     return pd.concat(xf_columns).reset_index(drop=True)
-
-
-@feat.register(Pipeline)
-def _(transformer: Pipeline, names):
-
-    last_xfer = transformer.steps[-1][1]
-
-    return feat(last_xfer, names)

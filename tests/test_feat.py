@@ -47,6 +47,7 @@ def test_string_not_supported():
     with pytest.raises(ValueError, match=r".* string `passthrough` .*"):
         feat(string, columns)
 
+
 def test_OneHotEncoder():
 
     expected = pd.DataFrame(
@@ -214,20 +215,16 @@ def test_Pipeline():
 
     assert feat(xfer_pipeline, ["meal"]).equals(expected)
 
+
 def test_Pipeline_with_passthrough():
 
-    expected = pd.DataFrame(
-        {"name": ["meal"], "feature": ["meal"],}
-    )
+    expected = pd.DataFrame({"name": ["meal"], "feature": ["meal"],})
 
-    xfer_pipeline = make_pipeline(
-        FunctionTransformer(group_meals), "passthrough"
-    )
+    xfer_pipeline = make_pipeline(FunctionTransformer(group_meals), "passthrough")
 
     xfer_pipeline.fit(X[["meal"]])
 
     assert feat(xfer_pipeline, ["meal"]).equals(expected)
-
 
 
 def test_ColumnTransformer1():
