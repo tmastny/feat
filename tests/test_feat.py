@@ -150,6 +150,25 @@ def test_KBinsDiscretizer_ordinal():
     assert feat(kbin, numeric).equals(expected)
 
 
+def group_meals(array):
+    return array.applymap(lambda x: "HB" if x == "SC" else x)
+
+
+def test_Pipeline():
+
+    expected = pd.DataFrame(
+        {"name": ["meal", "meal",], "feature": ["x0_BB", "x0_HB",],}
+    )
+
+    xfer_pipeline = make_pipeline(
+        FunctionTransformer(group_meals), OneHotEncoder(sparse=False)
+    )
+
+    xfer_pipeline.fit(X[["meal"]])
+
+    assert feat(xfer_pipeline, ["meal"]).equals(expected)
+
+
 def test_ColumnTransformer1():
     expected = pd.DataFrame(
         {
@@ -216,20 +235,38 @@ def test_ColumnTransformer1_rev():
     assert feat(preprocess).equals(expected)
 
 
-def group_meals(array):
-    return array.applymap(lambda x: "HB" if x == "SC" else x)
-
-
-def test_Pipeline():
-
+def test_ColumnTransformer_with_Pipeline():
     expected = pd.DataFrame(
-        {"name": ["meal", "meal",], "feature": ["x0_BB", "x0_HB",],}
+        {
+            "name": [
+                "meal",
+                "meal",
+                "lead_time",
+                "average_daily_rate",
+                "hotel",
+                "hotel",
+            ],
+            "feature": [
+                "x0_BB",
+                "x0_HB",
+                "lead_time",
+                "average_daily_rate",
+                "x0_City_Hotel",
+                "x0_Resort_Hotel",
+            ],
+        }
     )
 
     xfer_pipeline = make_pipeline(
         FunctionTransformer(group_meals), OneHotEncoder(sparse=False)
     )
 
-    xfer_pipeline.fit(X[["meal"]])
+    preprocess = make_column_transformer(
+        (xfer_pipeline, ["meal"]),
+        (StandardScaler(), numeric),
+        (OneHotEncoder(sparse=False), ["hotel"]),
+    )
 
-    assert feat(xfer_pipeline, ["meal"]).equals(expected)
+    preprocess.fit(X)
+
+    assert feat(preprocess).equals(expected)
