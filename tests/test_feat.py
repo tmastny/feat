@@ -1,4 +1,5 @@
 import os
+import pytest
 import pandas as pd
 from feat import feat
 from sklearn.preprocessing import StandardScaler
@@ -24,6 +25,24 @@ def test_default():
     assert feat(None, nominal).equals(
         pd.DataFrame({"name": nominal, "feature": nominal})
     )
+
+
+def test_string():
+    expected = pd.DataFrame({"name": numeric, "feature": numeric})
+
+    string = "passthrough"
+    columns = [1, 3]
+    all_columns = X.columns
+
+    assert feat(string, columns, all_columns).equals(expected)
+
+
+def test_string_not_supported():
+    string = "other_string"
+    columns = [1, 3]
+
+    with pytest.raises(ValueError, match=r".* string `passthrough` .*"):
+        feat(string, columns)
 
 
 def test_OneHotEncoder():

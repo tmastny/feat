@@ -1,7 +1,5 @@
 from functools import singledispatch
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import KBinsDiscretizer
 
 from typing import Union
@@ -13,6 +11,26 @@ import numpy as np
 @singledispatch
 def feat(transformer, columns):
     return pd.DataFrame({"name": columns, "feature": columns})
+
+
+@feat.register(str)
+def _(transformer: str, columns, all_columns=None):
+    if isinstance(columns[0], str):
+        return feat(None, columns)
+
+    if transformer != "passthrough":
+        raise ValueError(
+            "Transformer passed as the string '"
+            + transformer
+            + "'. Only the string `passthrough` and `sklearn` transformers are supported."
+        )
+
+    if all_columns is None:
+        raise ValueError(
+            "Columns were passed by index. Please pass all the original columns to `all_columns`."
+        )
+
+    return feat(None, all_columns[columns])
 
 
 @feat.register(OneHotEncoder)
