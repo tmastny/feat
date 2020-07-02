@@ -1,2 +1,2 @@
-def feat(x):
-    print("hello world!")
+def feat():
+    return "hello world!"
