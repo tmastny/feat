@@ -45,6 +45,14 @@ def test_string_not_supported():
         feat(string, columns)
 
 
+def test_string_all_columns():
+    string = "passthrough"
+    columns = [1, 3]
+
+    with pytest.raises(ValueError, match=r".* index.*"):
+        feat(string, columns)
+
+
 def test_OneHotEncoder():
 
     expected = pd.DataFrame(
