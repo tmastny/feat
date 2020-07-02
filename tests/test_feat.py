@@ -150,6 +150,7 @@ def test_KBinsDiscretizer_ordinal():
 
     assert feat(kbin, numeric).equals(expected)
 
+
 @pytest.mark.filterwarnings("ignore:Bins whose width")
 def test_KBinsDiscretizer_different_n_bins():
 
@@ -325,24 +326,25 @@ def test_ColumnTransformer_with_Pipeline():
 
     assert feat(preprocess).equals(expected)
 
+
 def test_ColumnTransformer_with_passthrough():
     expected = pd.DataFrame(
         {
             "name": [
                 "meal",
                 "meal",
+                "hotel",
+                "hotel",
                 "lead_time",
                 "average_daily_rate",
-                "hotel",
-                "hotel",
             ],
             "feature": [
                 "x0_BB",
                 "x0_HB",
-                "lead_time",
-                "average_daily_rate",
                 "x0_City_Hotel",
                 "x0_Resort_Hotel",
+                "lead_time",
+                "average_daily_rate",
             ],
         }
     )
@@ -354,7 +356,7 @@ def test_ColumnTransformer_with_passthrough():
     preprocess = make_column_transformer(
         (xfer_pipeline, ["meal"]),
         (OneHotEncoder(sparse=False), ["hotel"]),
-        remainder='passthrough'
+        remainder="passthrough",
     )
 
     preprocess.fit(X)

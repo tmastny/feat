@@ -11,7 +11,7 @@ import numpy as np
 
 
 @singledispatch
-def feat(transformer, columns):
+def feat(transformer, columns, all_columns=None):
     return pd.DataFrame({"name": columns, "feature": columns})
 
 
@@ -36,7 +36,7 @@ def _(transformer: str, columns, all_columns=None):
 
 
 @feat.register(OneHotEncoder)
-def _(transformer: OneHotEncoder, columns):
+def _(transformer: OneHotEncoder, columns, all_columns=None):
     n_columns = np.array([len(category) for category in transformer.categories_])
     if transformer.drop:
         n_columns = n_columns - 1
@@ -47,7 +47,7 @@ def _(transformer: OneHotEncoder, columns):
 
 
 @feat.register(KBinsDiscretizer)
-def _(transformer: KBinsDiscretizer, columns):
+def _(transformer: KBinsDiscretizer, columns, all_columns=None):
     if transformer.encode == "ordinal":
         return feat(None, columns)
 
@@ -64,7 +64,10 @@ def _(transformer: KBinsDiscretizer, columns):
 
 @feat.register(ColumnTransformer)
 def _(transformer: ColumnTransformer, columns=None, all_columns=None):
-    xf_columns = [feat(xfer[1], xfer[2]) for xfer in transformer.transformers_]
+    xf_columns = [
+        feat(xfer[1], xfer[2], all_columns=all_columns)
+        for xfer in transformer.transformers_
+    ]
 
     return pd.concat(xf_columns).reset_index(drop=True)
 
