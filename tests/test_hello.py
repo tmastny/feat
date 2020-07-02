@@ -59,8 +59,48 @@ def test_OrdinalEncoder():
 
     assert feat(oe, nominal).equals(expected)
 
+kbin_expected = pd.DataFrame({
+        'name': {
+        0: 'lead_time',
+        1: 'lead_time',
+        2: 'lead_time',
+        3: 'lead_time',
+        4: 'lead_time',
+        5: 'average_daily_rate',
+        6: 'average_daily_rate',
+        7: 'average_daily_rate',
+        8: 'average_daily_rate',
+        9: 'average_daily_rate'},
+        'feature': {
+        0: 'lead_time-4',
+        1: 'lead_time-36',
+        2: 'lead_time-87',
+        3: 'lead_time-171',
+        4: 'lead_time-457',
+        5: 'average_daily_rate-69',
+        6: 'average_daily_rate-94',
+        7: 'average_daily_rate-123',
+        8: 'average_daily_rate-162',
+        9: 'average_daily_rate-335'
+    }})
 
-def tet_KBinsDiscretizer():
-    # todo: test when a feature cannot be binned the desired amount
+def test_KBinsDiscretizer():
+    kbin = KBinsDiscretizer(n_bins=5, encode='onehot')
+    kbin.fit(X[numeric])
 
-    assert True == True
+    assert feat(kbin, numeric).equals(kbin_expected)
+
+def test_KBinsDiscretizer_dense():
+
+    kbin = KBinsDiscretizer(n_bins=5, encode='onehot-dense')
+    kbin.fit(X[numeric])
+
+    assert feat(kbin, numeric).equals(kbin_expected)
+
+def test_KBinsDiscretizer_ordinal():
+    expected = pd.DataFrame({"name": numeric, "feature": numeric})
+
+    kbin = KBinsDiscretizer(n_bins=5, encode='ordinal')
+    kbin.fit(X[numeric])
+
+    assert feat(kbin, numeric).equals(expected)
