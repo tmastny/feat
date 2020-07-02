@@ -1,6 +1,7 @@
 from functools import singledispatch
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OrdinalEncoder
 
 import pandas as pd
 import numpy as np
@@ -19,6 +20,7 @@ def _(transformer, columns):
 
     return pd.DataFrame({'name': name, 'feature': transformer.get_feature_names()})
 
+@feat.register(OrdinalEncoder)
 @feat.register(StandardScaler)
-def _(transformer, columns)
+def _(transformer, columns):
     return pd.DataFrame({'name': columns, 'feature': columns})

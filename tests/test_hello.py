@@ -3,6 +3,9 @@ import pandas as pd
 from feat import feat
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import KBinsDiscretizer
+
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.compose import make_column_transformer
 
@@ -15,6 +18,12 @@ X = hotels.drop('children', axis=1)
 nominal = ['hotel', 'meal']
 numeric = ['lead_time', 'average_daily_rate']
 
+def test_default():
+
+    expected = "default"
+
+    assert feat(1, 1) == expected
+
 
 def test_OneHotEncoder():
 
@@ -25,7 +34,7 @@ def test_OneHotEncoder():
 
     ohe = OneHotEncoder(sparse=False)
 
-    ohe.fit(hotels[nominal])
+    ohe.fit(X[nominal])
 
     assert feat(ohe, nominal).equals(expected)
 
@@ -38,13 +47,20 @@ def test_OneHotEncoder_drop():
 
     ohe = OneHotEncoder(sparse=False, drop='first')
 
-    ohe.fit(hotels[nominal])
+    ohe.fit(X[nominal])
 
     assert feat(ohe, nominal).equals(expected)
 
+def test_OrdinalEncoder():
+    expected = pd.DataFrame({"name": nominal, "feature": nominal})
 
-def test_default():
+    oe = OrdinalEncoder()
+    oe.fit(X[nominal])
 
-    expected = "default"
+    assert feat(oe, nominal).equals(expected)
 
-    assert feat(1, 1) == expected
+
+def tet_KBinsDiscretizer():
+    # todo: test when a feature cannot be binned the desired amount
+
+    assert True == True
