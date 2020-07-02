@@ -1,6 +1,7 @@
 import os
 import pytest
 import pandas as pd
+import numpy as np
 from feat import feat
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
@@ -148,6 +149,59 @@ def test_KBinsDiscretizer_ordinal():
     kbin.fit(X[numeric])
 
     assert feat(kbin, numeric).equals(expected)
+
+@pytest.mark.filterwarnings("ignore:Bins whose width")
+def test_KBinsDiscretizer_different_n_bins():
+
+    expected = pd.DataFrame(
+        {
+            "name": {
+                0: "lead_time",
+                1: "lead_time",
+                2: "lead_time",
+                3: "lead_time",
+                4: "average_daily_rate",
+                5: "average_daily_rate",
+                6: "average_daily_rate",
+                7: "average_daily_rate",
+                8: "low_rate",
+                9: "low_rate",
+                10: "low_rate",
+            },
+            "feature": {
+                0: "lead_time-8",
+                1: "lead_time-58",
+                2: "lead_time-151",
+                3: "lead_time-457",
+                4: "average_daily_rate-79",
+                5: "average_daily_rate-108",
+                6: "average_daily_rate-151",
+                7: "average_daily_rate-335",
+                8: "low_rate-78",
+                9: "low_rate-107",
+                10: "low_rate-151",
+            },
+        }
+    )
+
+    X_diff = X.assign(
+        low_rate=np.select(
+            [
+                X["average_daily_rate"] < 78,
+                X["average_daily_rate"] < 107,
+                X["average_daily_rate"] < 151,
+            ],
+            [0, 78, 107,],
+            default=151,
+        )
+    )
+
+    columns = numeric + ["low_rate"]
+    kbin = KBinsDiscretizer(n_bins=4, encode="onehot-dense")
+
+    kbin.fit(X_diff[columns])
+
+    assert feat(kbin, columns).equals(expected)
 
 
 def group_meals(array):
