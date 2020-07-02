@@ -2,7 +2,7 @@ import os
 import pytest
 import pandas as pd
 import numpy as np
-from feat import feat
+from feat import feat, column_names
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import OrdinalEncoder
@@ -37,7 +37,7 @@ def test_string():
     columns = [1, 3]
     all_columns = X.columns
 
-    assert feat(string, columns, all_columns).equals(expected)
+    assert feat(string, column_names(columns, all_columns)).equals(expected)
 
 
 def test_string_not_supported():
@@ -46,15 +46,6 @@ def test_string_not_supported():
 
     with pytest.raises(ValueError, match=r".* string `passthrough` .*"):
         feat(string, columns)
-
-
-def test_string_all_columns():
-    string = "passthrough"
-    columns = [1, 3]
-
-    with pytest.raises(ValueError, match=r".* index.*"):
-        feat(string, columns)
-
 
 def test_OneHotEncoder():
 
@@ -269,7 +260,7 @@ def test_ColumnTransformer1():
 
     preprocess.fit(X)
 
-    assert feat(preprocess).equals(expected)
+    assert feat(preprocess, X.columns).equals(expected)
 
 
 def test_ColumnTransformer1_rev():
@@ -302,7 +293,7 @@ def test_ColumnTransformer1_rev():
 
     preprocess.fit(X)
 
-    assert feat(preprocess).equals(expected)
+    assert feat(preprocess, X.columns).equals(expected)
 
 
 def test_ColumnTransformer_with_Pipeline():
@@ -339,7 +330,7 @@ def test_ColumnTransformer_with_Pipeline():
 
     preprocess.fit(X)
 
-    assert feat(preprocess).equals(expected)
+    assert feat(preprocess, X.columns).equals(expected)
 
 
 def test_ColumnTransformer_with_passthrough():
@@ -376,4 +367,4 @@ def test_ColumnTransformer_with_passthrough():
 
     preprocess.fit(X)
 
-    assert feat(preprocess, all_columns=X.columns).equals(expected)
+    assert feat(preprocess, X.columns).equals(expected)
