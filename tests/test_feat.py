@@ -223,6 +223,21 @@ def test_Pipeline():
 
     assert feat(xfer_pipeline, ["meal"]).equals(expected)
 
+def test_Pipeline_with_passthrough():
+
+    expected = pd.DataFrame(
+        {"name": ["meal"], "feature": ["meal"],}
+    )
+
+    xfer_pipeline = make_pipeline(
+        FunctionTransformer(group_meals), "passthrough"
+    )
+
+    xfer_pipeline.fit(X[["meal"]])
+
+    assert feat(xfer_pipeline, ["meal"]).equals(expected)
+
+
 
 def test_ColumnTransformer1():
     expected = pd.DataFrame(
