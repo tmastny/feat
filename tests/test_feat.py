@@ -365,3 +365,40 @@ def test_ColumnTransformer_with_passthrough():
     preprocess.fit(X)
 
     assert feat(preprocess, X.columns).equals(expected)
+
+
+def test_ColumnTransformer_with_indices():
+    expected = pd.DataFrame(
+        {
+            "name": [
+                "meal",
+                "meal",
+                "lead_time",
+                "average_daily_rate",
+                "hotel",
+                "hotel",
+            ],
+            "feature": [
+                "x0_BB",
+                "x0_HB",
+                "lead_time",
+                "average_daily_rate",
+                "x0_City_Hotel",
+                "x0_Resort_Hotel",
+            ],
+        }
+    )
+
+    xfer_pipeline = make_pipeline(
+        FunctionTransformer(group_meals), OneHotEncoder(sparse=False)
+    )
+
+    preprocess = make_column_transformer(
+        (xfer_pipeline, ["meal"]),
+        (StandardScaler(), [1, 3]),
+        (OneHotEncoder(sparse=False), [0]),
+    )
+
+    preprocess.fit(X)
+
+    assert feat(preprocess, X.columns).equals(expected)
