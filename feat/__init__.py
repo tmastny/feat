@@ -62,9 +62,9 @@ def _(transformer: KBinsDiscretizer, names, all_columns=None):
 
 
 def merge_feat(x, y):
-    return x.merge(y, left_on='feature', right_on='name') \
-        [["name_x", "feature_y"]] \
-        .rename(columns={"name_x": "name", "feature_y": "feature"})
+    return x.merge(y, left_on="feature", right_on="name")[
+        ["name_x", "feature_y"]
+    ].rename(columns={"name_x": "name", "feature_y": "feature"})
 
 
 @feat.register(Pipeline)
@@ -74,8 +74,7 @@ def _(transformer: Pipeline, names):
     input_names = names
     for _, xfer in transformer.steps:
         feats.append(feat(xfer, input_names))
-        input_names = feats[-1]['feature']
-
+        input_names = feats[-1]["feature"]
 
     return reduce(merge_feat, feats)
 
