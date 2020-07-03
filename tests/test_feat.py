@@ -437,3 +437,19 @@ def test_ColumnTransformer_with_selector():
     preprocess.fit(X)
 
     assert feat(preprocess, X.columns).equals(expected)
+
+
+def test_VarianceThreshold():
+    expected = pd.DataFrame(
+        {
+            "name": ["lead_time", "average_daily_rate",],
+            "feature": ["lead_time", "average_daily_rate",],
+        }
+    )
+
+    X_var = X[numeric].assign(no_var=150)
+
+    var = VarianceThreshold()
+    var.fit(X_var)
+
+    assert feat(var, X_var.columns).equals(expected)

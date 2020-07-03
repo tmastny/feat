@@ -1,6 +1,7 @@
 from functools import singledispatch
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import KBinsDiscretizer
+from sklearn.feature_selection import SelectorMixin
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
@@ -12,9 +13,9 @@ import numpy as np
 
 def column_names(columns, all_columns):
     if isinstance(columns[0], str):
-        return columns
+        return np.array(columns)
 
-    return all_columns[columns]
+    return np.array(all_columns)[columns]
 
 
 @singledispatch
@@ -76,3 +77,11 @@ def _(transformer: ColumnTransformer, names):
     ]
 
     return pd.concat(xf_columns).reset_index(drop=True)
+
+
+@feat.register(SelectorMixin)
+def _(transformer: SelectorMixin, names):
+    mask = transformer.get_support()
+    selected = names[mask]
+
+    return feat(None, selected)
