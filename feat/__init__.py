@@ -1,13 +1,12 @@
 from functools import singledispatch, reduce
+
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.feature_selection import SelectorMixin
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-
 from sklearn.decomposition import PCA
 
-from typing import Union
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
 
 import pandas as pd
 import numpy as np
