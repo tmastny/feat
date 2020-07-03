@@ -101,11 +101,12 @@ def _(transformer: SelectorMixin, names):
 
 @feat.register(PCA)
 def _(transformer: PCA, names):
+    feature_name = transformer.__class__.__name__
     n_features = transformer.n_components_
 
     df = pd.DataFrame(
         {
-            "name": np.repeat(PCA.__name__, n_features),
+            "name": np.repeat(feature_name, n_features),
             "feature": np.arange(0, n_features),
         }
     )
