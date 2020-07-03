@@ -228,6 +228,24 @@ def test_Pipeline_with_passthrough():
     assert feat(xfer_pipeline, ["meal"]).equals(expected)
 
 
+def test_Pipeline_with_SelectorMixin():
+
+    expected = pd.DataFrame(
+        {
+            "name": ["hotel", "hotel", "meal", "meal"],
+            "feature": ["x0_City_Hotel", "x0_Resort_Hotel", "x1_BB", "x1_HB"],
+        }
+    )
+
+    onehot_var = make_pipeline(
+        OneHotEncoder(sparse=False), VarianceThreshold(threshold=0.1)
+    )
+
+    onehot_var.fit(X[nominal])
+
+    assert feat(onehot_var, nominal).equals(expected)
+
+
 def test_ColumnTransformer1():
     expected = pd.DataFrame(
         {

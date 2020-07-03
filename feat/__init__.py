@@ -1,4 +1,4 @@
-from functools import singledispatch
+from functools import singledispatch, reduce
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.feature_selection import SelectorMixin
@@ -61,12 +61,23 @@ def _(transformer: KBinsDiscretizer, names, all_columns=None):
     return df
 
 
+def merge_feat(x, y):
+    return x.merge(y, left_on='feature', right_on='name') \
+        [["name_x", "feature_y"]] \
+        .rename(columns={"name_x": "name", "feature_y": "feature"})
+
+
 @feat.register(Pipeline)
 def _(transformer: Pipeline, names):
 
-    last_xfer = transformer.steps[-1][1]
+    feats = []
+    input_names = names
+    for _, xfer in transformer.steps:
+        feats.append(feat(xfer, input_names))
+        input_names = feats[-1]['feature']
 
-    return feat(last_xfer, names)
+
+    return reduce(merge_feat, feats)
 
 
 @feat.register(ColumnTransformer)
