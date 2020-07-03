@@ -5,6 +5,8 @@ from sklearn.feature_selection import SelectorMixin
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
+from sklearn.decomposition import PCA
+
 from typing import Union
 
 import pandas as pd
@@ -95,3 +97,20 @@ def _(transformer: SelectorMixin, names):
     selected = names[mask]
 
     return feat(None, selected)
+
+
+@feat.register(PCA)
+def _(transformer: PCA, names):
+    n_features = transformer.n_components_
+
+    df = pd.DataFrame(
+        {
+            "name": np.repeat(PCA.__name__, n_features),
+            "feature": np.arange(0, n_features),
+        }
+    )
+
+    df["feature"] = df["name"] + "-" + df["feature"].astype(str)
+    df["name"] = df["name"].apply(lambda x: names)
+
+    return df

@@ -9,6 +9,8 @@ from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import KBinsDiscretizer
 from sklearn.preprocessing import FunctionTransformer
 
+from sklearn.decomposition import PCA
+
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.compose import make_column_transformer
 from sklearn.compose import make_column_selector
@@ -471,3 +473,14 @@ def test_VarianceThreshold():
     var.fit(X_var)
 
     assert feat(var, X_var.columns).equals(expected)
+
+
+def test_PCA():
+    expected = pd.DataFrame(
+        {"name": [numeric, numeric], "feature": ["PCA-0", "PCA-1"],}
+    )
+
+    pca = PCA()
+    pca.fit(X[numeric])
+
+    assert feat(pca, numeric).equals(expected)
