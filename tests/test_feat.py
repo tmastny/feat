@@ -11,6 +11,7 @@ from sklearn.preprocessing import FunctionTransformer
 
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.compose import make_column_transformer
+from sklearn.compose import make_column_selector
 from sklearn.pipeline import make_pipeline
 
 dir = os.path.dirname(os.path.abspath(__file__))
@@ -397,6 +398,40 @@ def test_ColumnTransformer_with_indices():
         (xfer_pipeline, ["meal"]),
         (StandardScaler(), [1, 3]),
         (OneHotEncoder(sparse=False), [0]),
+    )
+
+    preprocess.fit(X)
+
+    assert feat(preprocess, X.columns).equals(expected)
+
+
+def test_ColumnTransformer_with_selector():
+    expected = pd.DataFrame(
+        {
+            "name": [
+                "hotel",
+                "hotel",
+                "meal",
+                "meal",
+                "meal",
+                "lead_time",
+                "average_daily_rate",
+            ],
+            "feature": [
+                "x0_City_Hotel",
+                "x0_Resort_Hotel",
+                "x1_BB",
+                "x1_HB",
+                "x1_SC",
+                "lead_time",
+                "average_daily_rate",
+            ],
+        }
+    )
+
+    preprocess = make_column_transformer(
+        (OneHotEncoder(sparse=False), make_column_selector(dtype_include=object)),
+        (StandardScaler(), numeric, make_column_selector(dtype_exclude=object)),
     )
 
     preprocess.fit(X)
