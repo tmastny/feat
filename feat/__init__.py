@@ -12,13 +12,6 @@ import pandas as pd
 import numpy as np
 
 
-def column_names(columns, all_columns):
-    if isinstance(columns[0], str):
-        return np.array(columns)
-
-    return np.array(all_columns)[columns]
-
-
 @singledispatch
 def feat(transformer, names):
     return pd.DataFrame({"name": names, "feature": names})
@@ -78,6 +71,13 @@ def _(transformer: Pipeline, names):
         input_names = feats[-1]["feature"]
 
     return reduce(merge_feat, feats)
+
+
+def column_names(columns, all_columns):
+    if isinstance(columns[0], str):
+        return np.array(columns)
+
+    return np.array(all_columns)[columns]
 
 
 @feat.register(ColumnTransformer)
