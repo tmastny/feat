@@ -520,4 +520,4 @@ def test_PCA_variance_pipeline():
     pca = make_pipeline(StandardScaler(), PCA(0.95, random_state=1))
     pca.fit(X)
 
-    assert feat(pca, X_b.columns).equals(expected)
+    assert feat(pca, X.columns).equals(expected)
