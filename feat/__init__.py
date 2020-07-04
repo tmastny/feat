@@ -8,12 +8,12 @@ from sklearn.decomposition import PCA
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 
-import pandas as pd
 import numpy as np
-
+import pandas as pd
+from pandas import DataFrame
 
 @singledispatch
-def feat(transformer, names):
+def feat(transformer, names) -> DataFrame:
     return pd.DataFrame({"name": names, "feature": names})
 
 
