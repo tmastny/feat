@@ -3,6 +3,8 @@ import pytest
 import pandas as pd
 import numpy as np
 from feat import feat, column_names
+
+from sklearn.datasets import load_breast_cancer
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import OrdinalEncoder
@@ -484,3 +486,38 @@ def test_PCA():
     pca.fit(X[numeric])
 
     assert feat(pca, numeric).equals(expected)
+
+
+def pca_variance_data():
+    X, _ = load_breast_cancer(return_X_y=True, as_frame=True)
+
+    expected = pd.DataFrame(
+        {
+            "name": [X.columns for i in range(0, 10)],
+            "feature": ["PCA-" + str(i) for i in range(0, 10)],
+        }
+    )
+
+    return (X, expected)
+
+
+def test_PCA_variance():
+    X, expected = pca_variance_data()
+
+    ss = StandardScaler()
+    scaled = ss.fit_transform(X)
+
+    pca = PCA(0.95, random_state=1)
+    pca.fit(scaled)
+
+    assert feat(pca, X.columns).equals(expected)
+
+
+@pytest.mark.xfail
+def test_PCA_variance_pipeline():
+    X, expected = pca_variance_data()
+
+    pca = make_pipeline(StandardScaler(), PCA(0.95, random_state=1))
+    pca.fit(X)
+
+    assert feat(pca, X_b.columns).equals(expected)
