@@ -12,9 +12,10 @@ import numpy as np
 import pandas as pd
 from pandas import DataFrame
 
+
 @singledispatch
 def feat(transformer, names) -> DataFrame:
-    return pd.DataFrame({"name": names, "feature": names})
+    return DataFrame({"name": names, "feature": names})
 
 
 @feat.register(str)
@@ -36,7 +37,7 @@ def _(transformer: OneHotEncoder, names):
 
     name = pd.Series(names).repeat(n_columns).reset_index(drop=True)
 
-    return pd.DataFrame({"name": name, "feature": transformer.get_feature_names()})
+    return DataFrame({"name": name, "feature": transformer.get_feature_names()})
 
 
 @feat.register(KBinsDiscretizer)
@@ -49,7 +50,7 @@ def _(transformer: KBinsDiscretizer, names, all_columns=None):
     edge_labels = [label[1:] for label in transformer.bin_edges_]
     feature = pd.concat(list(map(pd.Series, edge_labels))).reset_index(drop=True)
 
-    df = pd.DataFrame({"name": name, "feature": feature})
+    df = DataFrame({"name": name, "feature": feature})
     df["feature"] = df["name"] + "-" + df["feature"].apply(lambda x: str(round(x)))
 
     return df
@@ -103,7 +104,7 @@ def _(transformer: PCA, names):
     feature_name = transformer.__class__.__name__
     n_features = transformer.n_components_
 
-    df = pd.DataFrame(
+    df = DataFrame(
         {
             "name": np.repeat(feature_name, n_features),
             "feature": np.arange(0, n_features),
