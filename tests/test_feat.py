@@ -549,3 +549,37 @@ def test_PCA_variance_pipeline():
     pca.fit(X)
 
     assert feat(pca, X.columns).equals(expected)
+
+
+def test_SelectKBest_then_PCA():
+    expected = pd.DataFrame(
+        {
+            "name": [ten_best_features() for i in range(0, 5)],
+            "feature": ["PCA-" + str(i) for i in range(0, 5)],
+        }
+    )
+
+    X, y = load_breast_cancer(return_X_y=True, as_frame=True)
+
+    pipeline = make_pipeline(SelectKBest(), PCA(5, random_state=1))
+    pipeline.fit(X, y)
+
+    assert feat(pipeline, X.columns).equals(expected)
+
+
+def test_PCA_then_SelectKBest():
+    X, y = load_breast_cancer(return_X_y=True, as_frame=True)
+
+    expected = pd.DataFrame(
+        {
+            "name": [list(X.columns) for i in range(0, 5)],
+            "feature": ["PCA-" + str(i) for i in range(0, 5)],
+        }
+    )
+
+    pipeline = make_pipeline(
+        StandardScaler(), PCA(0.95, random_state=1), SelectKBest(k=5)
+    )
+    pipeline.fit(X, y)
+
+    assert feat(pipeline, X.columns).equals(expected)
