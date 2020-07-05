@@ -14,6 +14,7 @@ from sklearn.preprocessing import FunctionTransformer
 from sklearn.decomposition import PCA
 
 from sklearn.feature_selection import VarianceThreshold
+from sklearn.feature_selection import SelectKBest
 from sklearn.compose import make_column_transformer
 from sklearn.compose import make_column_selector
 from sklearn.pipeline import make_pipeline
@@ -475,6 +476,34 @@ def test_VarianceThreshold():
     var.fit(X_var)
 
     assert feat(var, X_var.columns).equals(expected)
+
+
+def ten_best_features():
+    return [
+        "mean radius",
+        "mean perimeter",
+        "mean area",
+        "mean concavity",
+        "mean concave points",
+        "worst radius",
+        "worst perimeter",
+        "worst area",
+        "worst concavity",
+        "worst concave points",
+    ]
+
+
+def test_SelectKBest():
+    expected = pd.DataFrame(
+        {"name": ten_best_features(), "feature": ten_best_features()}
+    )
+
+    X, y = load_breast_cancer(return_X_y=True, as_frame=True)
+
+    select10 = SelectKBest()
+    select10.fit(X, y)
+
+    assert feat(select10, X.columns).equals(expected)
 
 
 def test_PCA():
