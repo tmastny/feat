@@ -493,7 +493,7 @@ def pca_variance_data():
 
     expected = pd.DataFrame(
         {
-            "name": [X.columns for i in range(0, 10)],
+            "name": [list(X.columns) for i in range(0, 10)],
             "feature": ["PCA-" + str(i) for i in range(0, 10)],
         }
     )
@@ -513,7 +513,6 @@ def test_PCA_variance():
     assert feat(pca, X.columns).equals(expected)
 
 
-@pytest.mark.xfail
 def test_PCA_variance_pipeline():
     X, expected = pca_variance_data()
 

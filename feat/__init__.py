@@ -56,10 +56,28 @@ def _(transformer: KBinsDiscretizer, names, all_columns=None):
     return df
 
 
-def merge_feat(x, y):
-    return x.merge(y, left_on="feature", right_on="name")[
+def nest_feature(df: DataFrame):
+    n_rows = df.shape[0]
+    n_features = df["feature"].unique().shape[0]
+    if n_rows == n_features:
+        return df
+
+    return (
+        df.groupby(["feature"])
+        .apply(lambda x: list(x["name"]))
+        .reset_index()
+        .rename(columns={0: "name"})[["name", "feature"]]
+    )
+
+
+def merge_feat(x: DataFrame, y: DataFrame):
+    unnest_y = y.explode("name")
+
+    name_to_feat = x.merge(unnest_y, left_on="feature", right_on="name")[
         ["name_x", "feature_y"]
     ].rename(columns={"name_x": "name", "feature_y": "feature"})
+
+    return nest_feature(name_to_feat)
 
 
 @feat.register(Pipeline)
@@ -69,7 +87,7 @@ def _(transformer: Pipeline, names):
     input_names = names
     for _, xfer in transformer.steps:
         feats.append(feat(xfer, input_names))
-        input_names = feats[-1]["feature"]
+        input_names = feats[-1]["feature"].values
 
     return reduce(merge_feat, feats)
 
@@ -112,6 +130,6 @@ def _(transformer: PCA, names):
     )
 
     df["feature"] = df["name"] + "-" + df["feature"].astype(str)
-    df["name"] = df["name"].apply(lambda x: names)
+    df["name"] = df["name"].apply(lambda x: list(names))
 
     return df
