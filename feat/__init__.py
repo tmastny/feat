@@ -20,13 +20,17 @@ def feat(transformer, names) -> DataFrame:
 
 @feat.register(str)
 def _(transformer: str, names):
-    if transformer != "passthrough":
-        raise ValueError(
-            "Transformer passed as the string '"
-            + transformer
-            + "'. Only the string `passthrough` and `sklearn` transformers are supported."
-        )
-    return feat(None, names)
+    if transformer == "drop":
+        return DataFrame({"name": [], "feature": []})
+
+    if transformer == "passthrough":
+        return feat(None, names)
+
+    raise ValueError(
+        "Transformer passed as the string '"
+        + transformer
+        + "'. Only the string `passthrough` and `sklearn` transformers are supported."
+    )
 
 
 @feat.register(OneHotEncoder)

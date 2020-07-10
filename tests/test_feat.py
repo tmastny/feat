@@ -354,6 +354,23 @@ def test_ColumnTransformer_with_Pipeline():
     assert feat(preprocess, X.columns).equals(expected)
 
 
+def test_ColumnTransformer_with_drop():
+    expected = pd.DataFrame(
+        {
+            "name": ["hotel", "hotel", "lead_time",],
+            "feature": ["x0_City_Hotel", "x0_Resort_Hotel", "lead_time",],
+        }
+    )
+
+    preprocess = make_column_transformer(
+        (OneHotEncoder(sparse=False), ["hotel"]), (StandardScaler(), ["lead_time"])
+    )
+
+    preprocess.fit(X)
+
+    assert feat(preprocess, X.columns).equals(expected)
+
+
 def test_ColumnTransformer_with_passthrough():
     expected = pd.DataFrame(
         {
